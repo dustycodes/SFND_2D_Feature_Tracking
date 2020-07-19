@@ -64,6 +64,11 @@ int main(int argc, const char *argv[])
         frame.cameraImg = imgGray;
         dataBuffer.push_back(frame);
 
+        if (dataBuffer.size() > dataBufferSize)
+        {
+            dataBuffer.erase(dataBuffer.end());
+        }
+
         //// EOF STUDENT ASSIGNMENT
         cout << "#1 : LOAD IMAGE INTO BUFFER done" << endl;
 
@@ -81,6 +86,30 @@ int main(int argc, const char *argv[])
         {
             detKeypointsShiTomasi(keypoints, imgGray, false);
         }
+        else if (detectorType.compare("HARRIS") == 0)
+        {
+            detKeypointsHarris(keypoints, imgGray, false);
+        }
+        else if (detectorType.compare("FAST") == 0)
+        {
+            detKeypointsFast(keypoints, imgGray, false);
+        }
+        else if (detectorType.compare("BRISK") == 0)
+        {
+            detKeypointsBrisk(keypoints, imgGray, false);
+        }
+        else if (detectorType.compare("ORB") == 0)
+        {
+            detKeypointsOrb(keypoints, imgGray, false);
+        }
+        else if (detectorType.compare("AKAZE") == 0)
+        {
+            detKeypointsAkaze(keypoints, imgGray, false);
+        }
+        else if (detectorType.compare("SIFT") == 0)
+        {
+            detKeypointsSift(keypoints, imgGray, false);
+        }
         else
         {
             //...
@@ -95,7 +124,16 @@ int main(int argc, const char *argv[])
         cv::Rect vehicleRect(535, 180, 180, 150);
         if (bFocusOnVehicle)
         {
-            // ...
+            cv::Mat mat;
+            vehicleRect
+
+            std::remove_if(keypoints.begin(), keypoints.end(), [&](cv::KeyPoint* keyPoint)
+            {
+                if (cv::pointPolygonTest(vehicleRect, keyPoint, false) < 0)
+                {
+                    // Lock
+                }
+            });
         }
 
         //// EOF STUDENT ASSIGNMENT
