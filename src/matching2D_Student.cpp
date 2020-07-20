@@ -80,7 +80,6 @@ void detKeypointsShiTomasi(vector<cv::KeyPoint> &keypoints, cv::Mat &img, bool b
     // add corners to result vector
     for (auto it = corners.begin(); it != corners.end(); ++it)
     {
-
         cv::KeyPoint newKeyPoint;
         newKeyPoint.pt = cv::Point2f((*it).x, (*it).y);
         newKeyPoint.size = blockSize;
@@ -103,33 +102,32 @@ void detKeypointsShiTomasi(vector<cv::KeyPoint> &keypoints, cv::Mat &img, bool b
 
 void detKeypointsHarris(std::vector<cv::KeyPoint> &keypoints, cv::Mat &img, bool bVis)
 {
-    // compute detector parameters based on image size
-    int blockSize = 4;       //  size of an average block for computing a derivative covariation matrix over each pixel neighborhood
-    int apertureSize = 3;    //  TODO:
-    cv::BorderTypes borderType = cv::BORDER_DEFAULT;
+    cv::Mat output, output_norm, output_norm_scaled;
+    float blockSize = 4;       //  size of an average block for computing a derivative covariation matrix over each pixel neighborhood
+    int cornerThresh = 100;
 
-    double maxOverlap = 0.0; // max. permissible overlap between two features in %
-    double minDistance = (1.0 - maxOverlap) * blockSize;
-    int maxCorners = img.rows * img.cols / max(1.0, minDistance); // max. num. of keypoints
+    auto t = (double)cv::getTickCount();
 
-    double qualityLevel = 0.01; // minimal accepted quality of image corners
-    double k = 0.04;
+    // Detecting corners
+    output = cv::Mat::zeros(img.size(), CV_32FC1);
+    cornerHarris(img, output, 2, 3, 0.04);
 
-    // Apply corner detection
-    double t = (double)cv::getTickCount();
-    vector<cv::Point2f> corners;
+    // Normalizing
+    normalize(output, output_norm, 0, 255, cv::NORM_MINMAX, CV_32FC1, cv::Mat());
+    convertScaleAbs(output_norm, output_norm_scaled);
 
-    cv::cornerHarris(img, corners, blockSize, apertureSize, k, borderType);
-
-    // add corners to result vector
-    for (auto it = corners.begin(); it != corners.end(); ++it)
-    {
-
-        cv::KeyPoint newKeyPoint;
-        newKeyPoint.pt = cv::Point2f((*it).x, (*it).y);
-        newKeyPoint.size = blockSize;
-        keypoints.push_back(newKeyPoint);
+    // Drawing a circle around corners
+    for(int j = 0; j < output_norm.rows ; j++){
+        for(int i = 0; i < output_norm.cols; i++){
+            if((int) output_norm.at<float>(j,i) > cornerThresh){
+                cv::KeyPoint newKeyPoint;
+                newKeyPoint.pt = cv::Point2f(i, j);
+                newKeyPoint.size = blockSize;
+                keypoints.push_back(newKeyPoint);
+            }
+        }
     }
+
     t = ((double)cv::getTickCount() - t) / cv::getTickFrequency();
     cout << "Harris detection with n=" << keypoints.size() << " keypoints in " << 1000 * t / 1.0 << " ms" << endl;
 
