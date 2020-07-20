@@ -113,6 +113,8 @@ int main(int argc, const char *argv[])
         }
         else
         {
+            std::cerr << "No detector" << std::endl;
+            return -1;
             //...
         }
         //// EOF STUDENT ASSIGNMENT

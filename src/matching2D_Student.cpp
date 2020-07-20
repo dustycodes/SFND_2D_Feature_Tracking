@@ -41,12 +41,63 @@ void descKeypoints(vector<cv::KeyPoint> &keypoints, cv::Mat &img, cv::Mat &descr
     cv::Ptr<cv::DescriptorExtractor> extractor;
     if (descriptorType.compare("BRISK") == 0)
     {
-
         int threshold = 30;        // FAST/AGAST detection threshold score.
         int octaves = 3;           // detection octaves (use 0 to do single scale)
         float patternScale = 1.0f; // apply this scale to the pattern used for sampling the neighbourhood of a keypoint.
 
         extractor = cv::BRISK::create(threshold, octaves, patternScale);
+    }
+    else if (descriptorType.compare("BRIEF") == 0)
+    {
+        int bytes = 32;
+        bool useOrientation = false;
+        extractor = cv::xfeatures2d::BriefDescriptorExtractor::create(bytes, useOrientation);
+    }
+    else if (descriptorType.compare("ORB") == 0)
+    {
+        int features = 500;
+        float scaleFactor = 1.2f;
+        int levels = 8;
+        int edgeThreshold = 31;
+        int firstLevel = 0;
+        int WTA_K = 2;
+        cv::ORB::ScoreType scoreType = cv::ORB::ScoreType::HARRIS_SCORE;
+        int patchSize = 31;
+        int fastThresh = 20;
+
+        extractor = cv::ORB::create(features, scaleFactor, levels, edgeThreshold, firstLevel, WTA_K, scoreType, patchSize, fastThresh);
+    }
+    else if (descriptorType.compare("FREAK") == 0)
+    {
+        bool orientationNormed = true;
+        bool scaleNormed = true;
+        float patternScale = 22.0f;
+        int octaves = 4;
+        std::vector<int> selectedPairs = std::vector<int>();
+
+        extractor = cv::xfeatures2d::FREAK::create(orientationNormed, scaleNormed, patternScale, octaves, selectedPairs);
+    }
+    else if (descriptorType.compare("AKAZE") == 0)
+    {
+        cv::AKAZE::DescriptorType descriptor_type = cv::AKAZE::DESCRIPTOR_MLDB;
+        int descriptor_size = 0;
+        int descriptor_channels = 3;
+        float threshold = 0.001f;
+        int nOctaves = 4;
+        int nOctaveLayers = 4;
+        cv::KAZE::DiffusivityType diffusivity = cv::KAZE::DIFF_PM_G2;
+
+        extractor = cv::AKAZE::create(descriptor_type, descriptor_size, descriptor_channels, threshold, nOctaves, nOctaveLayers, diffusivity);
+    }
+    else if (descriptorType.compare("SIFT") == 0)
+    {
+        int nfeatures = 0;
+        int nOctaveLayers = 3;
+        double contrastThreshold = 0.04;
+        double edgeThreshold = 10;
+        double sigma = 1.6;
+
+        extractor = cv::xfeatures2d::SIFT::create(nfeatures, nOctaveLayers, contrastThreshold, edgeThreshold, sigma);
     }
     else
     {
