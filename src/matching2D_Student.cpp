@@ -18,23 +18,36 @@ void matchDescriptors(std::vector<cv::KeyPoint> &kPtsSource, std::vector<cv::Key
     }
     else if (matcherType.compare("MAT_FLANN") == 0)
     {
-        // ...
+        // TODO I am confused what he said in the video about data types. The documentation is unclear to me what I need to do to handle this
+//        if (descriptorType.compare())// DES_BINARY, DES_HOG
+        matcher = cv::DescriptorMatcher::create(cv::DescriptorMatcher::FLANNBASED);
     }
-
     // perform matching task
     if (selectorType.compare("SEL_NN") == 0)
     { // nearest neighbor (best match)
-
         matcher->match(descSource, descRef, matches); // Finds the best match for each descriptor in desc1
     }
     else if (selectorType.compare("SEL_KNN") == 0)
     { // k nearest neighbors (k=2)
+        int k = 2;
+        const float ratio_thresh = 0.7f;
 
-        // ...
+        std::vector< std::vector<cv::DMatch>> knnMatches;
+        matcher->knnMatch(descSource, descRef, knnMatches, k);
+        for (size_t i = 0; i < knnMatches.size(); i++)
+        {
+            //-- Filter matches using the Lowe's ratio test
+            if (knnMatches[i][0].distance < ratio_thresh * knnMatches[i][1].distance)
+            {
+                matches.push_back(knnMatches[i][0]);
+            }
+        }
+
+        std::cout << "Keypoints removed: " << knnMatches.size() - matches.size() << std::endl;
     }
 }
 
-// Use one of several types of state-of-art descriptors to uniquely identify keypoints
+// Use one of several types of state -of-art descriptors to uniquely identify keypoints
 void descKeypoints(vector<cv::KeyPoint> &keypoints, cv::Mat &img, cv::Mat &descriptors, string descriptorType)
 {
     // select appropriate descriptor
@@ -101,8 +114,8 @@ void descKeypoints(vector<cv::KeyPoint> &keypoints, cv::Mat &img, cv::Mat &descr
     }
     else
     {
-
-        //...
+        std::cerr << "Failed to find descriptor type " << descriptorType << std::endl;
+        return;
     }
 
     // perform feature description
@@ -229,8 +242,6 @@ void detKeypointsBrisk(std::vector<cv::KeyPoint> &keypoints, cv::Mat &img, bool 
     auto brisk = cv::BRISK::create(thresh, octaves, patternScales);
 
     brisk->detect(img, keypoints, mask);
-    // TODO
-//    brisk->compute(img, keypoints, )
 
     // visualize results
     if (bVis)
