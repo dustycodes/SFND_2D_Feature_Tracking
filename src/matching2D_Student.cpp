@@ -81,15 +81,7 @@ double descKeypoints(vector<cv::KeyPoint> &keypoints, cv::Mat &img, cv::Mat &des
     }
     else if (descriptorType.compare("AKAZE") == 0)
     {
-        cv::AKAZE::DescriptorType descriptor_type = cv::AKAZE::DESCRIPTOR_MLDB;
-        int descriptor_size = 0;
-        int descriptor_channels = 3;
-        float threshold = 0.001f;
-        int nOctaves = 4;
-        int nOctaveLayers = 4;
-        cv::KAZE::DiffusivityType diffusivity = cv::KAZE::DIFF_PM_G2;
-
-        extractor = cv::AKAZE::create(descriptor_type, descriptor_size, descriptor_channels, threshold, nOctaves, nOctaveLayers, diffusivity);
+        extractor = cv::AKAZE::create();
     }
     else if (descriptorType.compare("SIFT") == 0)
     {
@@ -320,17 +312,9 @@ double  detKeypointsAkaze(std::vector<cv::KeyPoint> &keypoints, cv::Mat &img, bo
 double detKeypointsSift(std::vector<cv::KeyPoint> &keypoints, cv::Mat &img, bool bVis)
 {
     double t = (double)cv::getTickCount();
+    auto detector = cv::xfeatures2d::SIFT::create();
+    detector->detect(img, keypoints);
 
-    int features = 0;
-    int octaveLayers = 3;
-    double contrastThreshold = 0.04;
-    double edgeThreshold = 10;
-    double sigma = 1.6;
-    cv::InputArray mask = cv::noArray();
-
-    auto sift = cv::xfeatures2d::SIFT::create(features, octaveLayers, contrastThreshold, edgeThreshold, sigma);
-
-    sift->detect(img, keypoints, mask);
     t = ((double)cv::getTickCount() - t) / cv::getTickFrequency();
     cout << "Fast detection with n=" << keypoints.size() << " keypoints in " << 1000 * t / 1.0 << " ms" << endl;
 
