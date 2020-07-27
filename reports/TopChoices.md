@@ -1,8 +1,39 @@
+# Rubric Points
+
+## MP.0 Mid-Term Report
+I wrote this document to address each point on the grading rubric
+
+## MP.1 Data Buffer Optimization
+I implemented a ring buffer that removes the oldest image when the maximum sized is reached in the queue.
+
+## MP.2 Keypoint Detection
+I added support for detectors HARRIS, FAST, BRISK, ORB, AKAZE, and SIFT and made them selectable by setting a string accordingly.
+
+## MP.3 Keypoint Removal
+I removed all keypoints that were not included in the region of interest.
+
+## MP.4 Keypoint Descriptors
+I added support for descriptors BRIEF, ORB, FREAK, AKAZE and SIFT and made them selectable by setting a string accordingly.
+
+## MP.5 Descriptor Matching
+I added support for FLANN matching as well as k-nearest neighbor selection. Both methods are selectable using the respective strings in the main function.
+
+## MP.6 Descriptor Distance Ratio
+I used the K-Nearest-Neighbor matching to implement the descriptor distance ratio test, which looks at the ratio of best vs. second-best match to decide whether to keep an associated pair of keypoints.
+
+## MP.7 Performance Evaluation 1
+I kept a count for the number of keypoints on the preceding vehicle for all 10 images and took note of the distribution of their neighborhood size. I did it for all detectors.
+
+## MP.8 Performance Evaluation 2
+I kept a count for the number of matched keypoints for all 10 images using all possible combinations of detectors and descriptors. In the matching step, the BF approach is used with the descriptor distance ratio set to 0.8.
+
+## MP.9 Performance Evaluation 3
+I logged the time it takes for keypoint detection and descriptor extraction. The results are entered into a spreadsheet and based on this data, the TOP3 detector / descriptor combinations are recommended as the best choice for our purpose of detecting keypoints on vehicles.
+
 # Top 3 Choices for 2d Feature Tracking Algorithm Combinations on This Dataset
 1. FAST BRIEF MAT_BF DES_BINARY SEL_NN : This one is the best  has 113 less key points than the topmost key points choice and 9 less matches. This means the key points identified by FAST are holding a match better between steps. It is also very fast at 0.0265398 seconds on this dataset.
 2. AKAZE ORB MAT_BF DES_BINARY SEL_NN : This one is the best overall choice. The biggest downfall is that it takes 0.357775 seconds on this dataset. This is still very fast but slower than other options.
 3. AKAZE AKAZE MAT_BF DES_BINARY SEL_KNN : This combo has good overall performance, slower than the other top 2. But is using the KNN which will put an upper bound on sparsely located, feature rich, images so performance should be consistent on whatever dataset you decide to use.
-
 
 # Top For Number of KeyPoints
 1. AKAZE
